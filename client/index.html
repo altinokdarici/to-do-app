@@ -11,9 +11,20 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
     <script type="application/javascript" src="index.js"></script>
+    <style>
+        body {
+            height: 100vh;
+        }
+
+        @supports (height: 100dvh) {
+            body {
+                height: 100dvh;
+            }
+        }
+    </style>
 </head>
 
-<body class="d-flex flex-column vh-100 overflow-hidden px-2">
+<body class="d-flex flex-column overflow-hidden px-2">
     <!--head-->
     <div class="d-flex justify-content-center align-items-center py-2 px-1 gap-3">
         <!--logo-->
