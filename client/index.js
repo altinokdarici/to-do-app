@@ -4,7 +4,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
     document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 });
 
-const url = "https://real-todo-app.vercel.app/api";
+const url = "/api";
 
 async function getRecords() {
     const response = await fetch(url, {
