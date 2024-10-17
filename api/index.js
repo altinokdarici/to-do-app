@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, "..", 'client')));
 
 function getUserId(req) {
-    return req.oidc.user.sid;
+    return req.oidc.user.sub;
 }
 
 // GET: Retrieve all  list items
@@ -60,7 +60,7 @@ app.get('/api/:id', async (req, res) => {
     const { id } = req.params;
     const userId = getUserId(req);
     try {
-        const result = await queryItem(id,userId);
+        const result = await queryItem(id, userId);
         if (!result) {
             return res.status(404).send({ error: 'Item not found' });
         }
@@ -92,7 +92,7 @@ app.post('/api', async (req, res) => {
 app.put('/api/:id', async (req, res) => {
     const { id } = req.params;
     const { title, is_completed } = req.body;
-    const userId = getUserId(req); 
+    const userId = getUserId(req);
     try {
         const result = await sql`
             UPDATE "todo_items"
