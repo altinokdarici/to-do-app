@@ -35,6 +35,10 @@ function getUserId(req) {
     return req.oidc.user.sub;
 }
 
+app.get("/api/user", (req, res) => {
+    res.json(req.oidc.user);
+});
+
 // GET: Retrieve all  list items
 app.get('/api', async (req, res) => {
     try {

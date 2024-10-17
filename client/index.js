@@ -5,6 +5,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 });
 
 const url = "/api";
+const urlUser = "/api/user";
 
 async function getRecords() {
     const response = await fetch(url, {
@@ -57,6 +58,19 @@ async function deleteRecord(id) {
     })
 
     return response.ok;
+}
+
+async function getUser() {
+    const response = await fetch(urlUser, {
+        method: "GET"
+    });
+
+    if (response.ok) {
+        const user = await response.json();
+
+        return user;
+    }
+    alert("Error");
 }
 
 function createItem(item) {
@@ -235,7 +249,9 @@ let records;
 let lists;
 window.onpageshow = async () => {
     records = await getRecords();
-
+    const user = await getUser();
+    const img = document.getElementById("user-img");
+    img.setAttribute("src", `${user.picture}`);
     //get ul div from html
     lists = document.getElementById("lists");
 
