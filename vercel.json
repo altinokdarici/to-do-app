@@ -1,13 +1,9 @@
 {
 	"version": 2,
-	"routes": [
+	"rewrites": [
 		{
-			"src": "/(.*)",
-			"dest": "/api"
-		},
-		{
-			"src": "/.*",
-			"status": 404
+			"source": "/(.*)",
+			"destination": "/api"
 		}
 	]
 }

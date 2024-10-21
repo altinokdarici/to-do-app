@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const { sql } = require('@vercel/postgres');
-const { auth } = require('express-openid-connect');
+const { auth, requiresAuth } = require('express-openid-connect');
 const path = require('path');
 
 const port = process.env.PORT || 3000;
@@ -18,9 +18,14 @@ function getBaseUrl(hostname) {
     return hostname === 'localhost' ? `http://localhost:${port}` : `https://${hostname}`;
 }
 
+app.use("/public", express.static(path.join(__dirname, "..", 'public')));
+
+app.use(express.static(path.join(__dirname, "..", 'client')));
+
+
 app.use((req, res, next) => {
     return auth({
-        authRequired: true,
+        authRequired: false,
         auth0Logout: true,
         secret: process.env.AUTH_CLIENT_SECRET,
         baseURL: getBaseUrl(req.hostname),
@@ -29,18 +34,21 @@ app.use((req, res, next) => {
     })(req, res, next);
 });
 
-app.use(express.static(path.join(__dirname, "..", 'client')));
+app.get("/api/user", (req, res) => {
+    if (!req.oidc?.user) {
+        res.status(401).send({ error: 'User is not authenticated' });
+        return;
+    }
+    res.json(req.oidc?.user);
+});
 
 function getUserId(req) {
     return req.oidc.user.sub;
 }
 
-app.get("/api/user", (req, res) => {
-    res.json(req.oidc.user);
-});
 
 // GET: Retrieve all  list items
-app.get('/api', async (req, res) => {
+app.get('/api', requiresAuth(), async (req, res) => {
     try {
         const userId = getUserId(req);
         const result = await sql`SELECT * FROM "todo_items" WHERE "user_id" = ${userId};`;
@@ -60,7 +68,7 @@ async function queryItem(id, userId) {
 }
 
 // GET: Retrieve a single  list item by ID
-app.get('/api/:id', async (req, res) => {
+app.get('/api/:id', requiresAuth(), async (req, res) => {
     const { id } = req.params;
     const userId = getUserId(req);
     try {
@@ -76,7 +84,7 @@ app.get('/api/:id', async (req, res) => {
 });
 
 // POST: Create a new  list item
-app.post('/api', async (req, res) => {
+app.post('/api', requiresAuth(), async (req, res) => {
     const { title, is_completed = false } = req.body;
     const userId = getUserId(req);
     try {
@@ -93,7 +101,7 @@ app.post('/api', async (req, res) => {
 });
 
 // PUT: Update an existing  list item
-app.put('/api/:id', async (req, res) => {
+app.put('/api/:id', requiresAuth(), async (req, res) => {
     const { id } = req.params;
     const { title, is_completed } = req.body;
     const userId = getUserId(req);
@@ -115,7 +123,7 @@ app.put('/api/:id', async (req, res) => {
 });
 
 // DELETE: Remove a  list item by ID
-app.delete('/api/:id', async (req, res) => {
+app.delete('/api/:id', requiresAuth(), async (req, res) => {
     const { id } = req.params;
     const userId = getUserId(req);
     try {

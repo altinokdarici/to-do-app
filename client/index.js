@@ -4,62 +4,9 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
     document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 });
 
-const url = "/api";
 const urlUser = "/api/user";
 
-async function getRecords() {
-    const response = await fetch(url, {
-        method: "GET"
-    });
-    if (response.ok) {
-        const record = await response.json();
-
-        return record;
-    }
-    alert("Error");
-}
-
-async function putRecord(id, item) {
-    const response = await fetch(`${url}/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(item),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-
-    if (response.ok) {
-        const updatedItem = await response.json();
-
-        return updatedItem;
-    }
-    alert("Error! Item is not updated.")
-}
-
-async function postRecord(item) {
-    const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(item),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-
-    if (response.ok) {
-        const postedItem = await response.json();
-        return postedItem;
-    }
-    alert("item is not added");
-}
-
-async function deleteRecord(id) {
-    const response = await fetch(`${url}/${id}`, {
-        method: "DELETE",
-    })
-
-    return response.ok;
-}
-
+//get user info
 async function getUser() {
     const response = await fetch(urlUser, {
         method: "GET"
@@ -67,10 +14,93 @@ async function getUser() {
 
     if (response.ok) {
         const user = await response.json();
-
         return user;
     }
-    alert("Error");
+
+    if (response.status === 401) {
+        return undefined;
+    }
+
+    throw new Error("An issue occured while obtaining user information");
+}
+
+
+function getRecordsFromLocalStorage() {
+    const itemArray = localStorage.getItem("items");
+    return itemArray ? JSON.parse(itemArray) : [];
+}
+
+async function getItems() {
+    let records;
+    if (repo) {
+        records = await repo.get();
+    } else {
+        records = getRecordsFromLocalStorage();
+    }
+
+    return records;
+}
+
+
+
+async function putRecord(id, item) {
+    for (const record of records) {
+        if (record.id === id) {
+            record.title = item.title;
+            record.is_completed = item.is_completed;
+            break;
+        }
+    }
+
+    if (repo) {
+        await repo.update(id, item);
+    }
+    else {
+        saveLocalStorage(records)
+    }
+}
+
+function saveLocalStorage(items) {
+    localStorage.setItem("items", JSON.stringify(items));
+}
+
+
+
+async function postRecord(item) {
+    let newItem;
+
+    if (repo) {
+        newItem = await repo.save(item);
+
+        records.push(newItem);
+    } else {
+        newItem = {
+            id: records.length === 0 ? 0 : records[records.length - 1].id + 1,
+            title: item.title,
+            is_completed: false
+        }
+
+        records.push(newItem);
+
+        saveLocalStorage(records);
+    }
+
+    return newItem;
+}
+
+
+async function deleteRecord(id) {
+    for (const record of records) {
+        if (record.id === id) {
+            records.splice(records.indexOf(record), 1);
+        }
+    }
+
+    if (repo) {
+        await repo.delete(id);
+    } else {
+        saveLocalStorage(records);
+    }
 }
 
 function createItem(item) {
@@ -134,12 +164,12 @@ async function onClickAddNote() {
     const newNote = await postRecord(newItem);
 
     lists.append(createItem(newNote));
-    records.push(newNote);
+
 
     document.getElementById("new-note").value = "";
 }
 
-function onNewNoteKeyUp(event) {
+function onNewNoteKeyDown(event) {
     if (event.key === 'Enter') {
         event.preventDefault(); // Prevent the default action (like a newline in the textarea)
         onClickAddNote(); // Call the function to add a note
@@ -167,61 +197,52 @@ function createOnCheckBoxInputChange(item, toDo, listCard) {
             toDo.contentEditable = true;
         }
 
-        const updatedItem = await putRecord(item.id, updated);
-
-        for (const record of records) {
-            if (record.id === updatedItem.id) {
-                record.is_completed = updatedItem.is_completed;
-                break;
-            }
-        }
+        await putRecord(item.id, updated);
     }
 }
 
 function createOnClickDelete(item, listCard, deleteButton) {
     return async function () {
         deleteButton.disabled = true;
-        if (await deleteRecord(item.id)) {
-            listCard.remove();
-            for (const record of records) {
-                if (record.id === item.id) {
-                    records.splice(records.indexOf(record), 1);
-                }
-            }
-        } else {
-            alert("The item cannot be deleted");
-            deleteButton.disabled = false;
-        }
+        await deleteRecord(item.id)
+        listCard.remove();
+
+        // } else {
+        //     alert("The item cannot be deleted");
+        //     deleteButton.disabled = false;
+        // }
     }
 }
 
 function createOnToDoBlur(item, toDo) {
     return async function () {
         if (!toDo.textContent || toDo.textContent.length === 0) {
-            const willBeDeleted = await deleteRecord(item.id);
-            if (willBeDeleted) {
-                lists.innerHTML = "";
-                for (const record of records) {
-                    if (record.id === item.id) {
-                        records.splice(records.indexOf(record), 1);
-                    } else {
-                        lists.append(createItem(record));
-                    }
-                }
-            }
+            await deleteRecord(item.id);
 
+            lists.innerHTML = "";
+            for (const record of records) {
+                lists.append(createItem(record));
+
+            }
         } else {
             const updated = {
-                title: toDo.textContent
+                title: toDo.textContent,
+                is_completed: item.is_completed
             }
-
-            const updatedItem = await putRecord(item.id, updated);
-            for (const record of records) {
-                if (record.id === item.id) {
-                    record.title = updatedItem.title;
-                }
-            }
+            await putRecord(item.id, updated);
         }
+    }
+}
+
+async function toggleSignInOut() {
+    if (user) {
+        const img = document.getElementById("user-img");
+        img.setAttribute("src", user.picture);
+        const signIn = document.getElementById("sign-in");
+        signIn.classList.add("d-none");
+    } else {
+        const signOut = document.getElementById("sign-out");
+        signOut.classList.add("d-none");
     }
 }
 
@@ -247,15 +268,21 @@ function onSearchKeyUp(event) {
 
 let records;
 let lists;
+let user;
+let repo;
 window.onpageshow = async () => {
-    records = await getRecords();
-    const user = await getUser();
-    const img = document.getElementById("user-img");
-    img.setAttribute("src", `${user.picture}`);
     //get ul div from html
     lists = document.getElementById("lists");
+    user = await getUser();
+    if (user) {
+        repo = new RecordsRepositoryApi();
+    }
+    toggleSignInOut();
 
+    records = await getItems();
+    console.log(records);
     for (const record of records) {
         lists.append(createItem(record));
     }
+
 }
