@@ -1,6 +1,24 @@
 {
     "name": "Just'nTime",
     "short_name": "Just'nTime",
+    "description": "Just'nTime is a task management app that helps users organize and track their to-do lists effortlessly. Add tasks, manage them on the go, and seamlessly save them to your account for future access.",
+    "id": "786831dd-edc9-4f50-b3c5-bc2d93a0292c",
+    "background_color": "#212529",
+    "theme_color": "#212529",
+    "start_url": "https://justntime.vercel.app",
+    "display": "standalone",
+    "dir": "ltr",
+    "lang": "en",
+    "orientation": "any",
+    "categories": [
+        "productivity",
+        "utilities",
+        "organization",
+        "lifestyle",
+        "education",
+        "business",
+        "tools"
+    ],
     "icons": [
         {
             "src": "public/images/android-chrome-192x192.png",
@@ -13,7 +31,11 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#212529",
-    "background_color": "#212529",
-    "display": "standalone"
+    "screenshots": [
+        {
+            "src": "public/images/main-page.jpeg",
+            "sizes": "1170x2532",
+            "type": "image/jpeg"
+        }
+    ]
 }
