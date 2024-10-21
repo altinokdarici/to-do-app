@@ -152,7 +152,7 @@ function createItem(item) {
 
 async function onClickAddNote() {
     const input = document.getElementById("new-note");
-    const title = input.value;
+    const title = input.textContent;
     if (!title || title.length === 0) {
         alert("There is nothing to be added");
         return;
@@ -166,7 +166,7 @@ async function onClickAddNote() {
     lists.append(createItem(newNote));
 
 
-    document.getElementById("new-note").value = "";
+    document.getElementById("new-note").textContent = "";
 }
 
 function onNewNoteKeyDown(event) {
@@ -238,11 +238,11 @@ async function toggleSignInOut() {
     if (user) {
         const img = document.getElementById("user-img");
         img.setAttribute("src", user.picture);
-        const signIn = document.getElementById("sign-in");
-        signIn.classList.add("d-none");
-    } else {
         const signOut = document.getElementById("sign-out");
-        signOut.classList.add("d-none");
+        signOut.classList.remove("d-none");
+    } else {
+        const signIn = document.getElementById("sign-in");
+        signIn.classList.remove("d-none");
     }
 }
 
@@ -266,16 +266,45 @@ function onSearchKeyUp(event) {
     }, 400);
 }
 
+function onDiscardTasks() {
+    location.href = "/login";
+    localStorage.clear();
+}
+
+function onSaveTasksToAccount() {
+    location.href = "/login";
+}
+
+async function postLocalToApi() {
+    console.log("save to account is clicked");
+    const tasks = getRecordsFromLocalStorage().map(item => ({ title: item.title }));
+    console.log(tasks);
+    for (const task of tasks) {
+        taskFromLocal = await repo.save(task);
+    }
+}
+
 let records;
 let lists;
 let user;
 let repo;
+
+window.onload = async () => {
+    document.getElementById('new-note').textContent = "";
+    document.getElementById('footer').classList.remove('d-none');
+}
+
 window.onpageshow = async () => {
     //get ul div from html
     lists = document.getElementById("lists");
+    lists.innerHTML = "";
     user = await getUser();
     if (user) {
         repo = new RecordsRepositoryApi();
+        if (localStorage.getItem("items")) {
+            await postLocalToApi();
+            localStorage.removeItem("items");
+        }
     }
     toggleSignInOut();
 

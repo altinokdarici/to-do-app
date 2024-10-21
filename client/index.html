@@ -29,10 +29,32 @@
         .custom-dropdown::after {
             content: unset;
         }
+
+        .no-outline:focus {
+            outline: none;
+        }
+
+        .square-img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sign-out-min-width {
+            min-width: unset;
+        }
+
+        .bottom-input-size {
+            max-height: 97.278px;
+            min-height: 36px;
+        }
+
+        .body-min-width {
+            min-width: 330px;
+        }
     </style>
 </head>
 
-<body style="min-width: 330px;" class="d-flex flex-column overflow-hidden px-2">
+<body class="d-flex flex-column overflow-hidden px-2 body-min-width">
     <!--head-->
     <div class="d-flex justify-content-center align-items-center py-2 gap-3">
         <!--logo-->
@@ -40,25 +62,44 @@
         <!--search-bar-->
         <input onkeyup="onSearchKeyUp(event)" class="flex-grow-1 my-1 p-2 form-control shadow-none" type="text"
             placeholder="Search...">
-
         <!--sign-out-->
-        <div id="sign-out" class="dropdown">
+        <div id="sign-out" class="dropdown d-none">
             <button class="btn btn-secondary dropdown-toggle border border-0 bg-transparent p-0 custom-dropdown"
                 type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img id="user-img" style="width: 40px; height: 40px;"
-                    class="rounded-circle border border-1 border-dark-subtle">
+                <img id="user-img" class="rounded-circle border border-1 border-dark-subtle square-img">
             </button>
-            <ul style="min-width: unset;" class="dropdown-menu py-1 shadow border border-1 border-light-subtle">
+            <ul class="dropdown-menu py-1 shadow border border-1 border-light-subtle sign-out-min-width">
                 <li><a class="dropdown-item" href="/logout">Sign out</a></li>
             </ul>
         </div>
-
         <!--sign-in-->
-        <a id="sign-in"
-            class="border border-1 border-dark-subtle text-nowrap px-2 py-1 text-decoration-none btn btn-primary shadow"
-            href="/login">Sign
-            in</a>
+        <!-- Button trigger modal -->
+        <button id="sign-in" type="button" class="d-none btn btn-primary shadow text-nowrap" data-bs-toggle="modal"
+            data-bs-target="#exampleModal">
+            Sign in
+        </button>
 
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        It looks like you’ve added some tasks before signing in.
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="onDiscardTasks()" type="button" class="btn btn-danger"
+                            data-bs-dismiss="modal">Discard
+                            tasks</button>
+                        <button onclick="onSaveTasksToAccount()" id="sign-in-no" type="button"
+                            class="btn btn-success">Save
+                            tasks to account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
@@ -67,13 +108,14 @@
     </ul>
 
     <!--bottom-->
-    <div class="d-flex flex-row justify-content-between align-items-center border border-secondary-subtle my-1">
-        <textarea style="resize: none;" id="new-note" onkeydown="onNewNoteKeyDown(event)"
-            class="flex-grow-1 border border-0 py-1" rows="1"></textarea>
-        <button onclick="onClickAddNote()" id="add-note"
-            class="d-flex flex-row gap-1 border border-0 btn btn-primary rounded-0">
+    <div class="d-flex flex-row justify-content-center align-items-end  my-1 d-none" id="footer">
+        <div contenteditable="plaintext-only" id="new-note" onkeydown="onNewNoteKeyDown(event)"
+            class="bottom-input-size flex-grow-1 border border-1 overflow-auto no-outline p-1 border-secondary-subtle">
+        </div>
+        <button onclick=" onClickAddNote()" id="add-note"
+            class="d-flex gap-1 border border-0 btn btn-primary rounded-0">
             <i class="bi bi-card-checklist"></i>
-            <div>Add Note</div>
+            <div class="text-nowrap">Add Note</div>
         </button>
     </div>
 </body>
