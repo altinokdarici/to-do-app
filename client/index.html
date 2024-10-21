@@ -25,12 +25,16 @@
                 height: 100dvh;
             }
         }
+
+        .custom-dropdown::after {
+            content: unset;
+        }
     </style>
 </head>
 
 <body style="min-width: 330px;" class="d-flex flex-column overflow-hidden px-2">
     <!--head-->
-    <div class="d-flex justify-content-center align-items-center py-2 px-1 gap-3">
+    <div class="d-flex justify-content-center align-items-center py-2 gap-3">
         <!--logo-->
         <div class="fs-5">Just'nTime</div>
         <!--search-bar-->
@@ -39,8 +43,8 @@
 
         <!--sign-out-->
         <div id="sign-out" class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle border border-0 bg-transparent p-0" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false">
+            <button class="btn btn-secondary dropdown-toggle border border-0 bg-transparent p-0 custom-dropdown"
+                type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <img id="user-img" style="width: 40px; height: 40px;"
                     class="rounded-circle border border-1 border-dark-subtle">
             </button>
