@@ -266,6 +266,15 @@ function onSearchKeyUp(event) {
     }, 400);
 }
 
+function onClickSignIn() {
+    if (getRecordsFromLocalStorage().length > 0) {
+        const myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        myModal.show();
+    } else {
+        location.href = "/login";
+    }
+}
+
 function onDiscardTasks() {
     location.href = "/login";
     localStorage.clear();
@@ -276,7 +285,6 @@ function onSaveTasksToAccount() {
 }
 
 async function postLocalToApi() {
-    console.log("save to account is clicked");
     const tasks = getRecordsFromLocalStorage().map(item => ({ title: item.title }));
     console.log(tasks);
     for (const task of tasks) {
