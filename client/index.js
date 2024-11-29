@@ -325,7 +325,6 @@ window.onload = async () => {
 }
 
 window.onpageshow = async () => {
-    //get ul div from html
     lists = document.getElementById("lists");
     lists.innerHTML = "";
     user = await getUser();

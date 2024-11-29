@@ -17,7 +17,8 @@
         "lifestyle",
         "education",
         "business",
-        "tools"
+        "tools",
+        "checks"
     ],
     "icons": [
         { "src": "public/images/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
