@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "app.vercel.justntime.twa",
-        "sha256_cert_fingerprints": ["D4:FC:00:46:2E:15:51:3A:1F:5E:7F:64:E0:44:AF:33:0A:FA:A8:78:DB:F8:6E:56:17:8E:5B:8C:13:61:C2:4F"]
+        "sha256_cert_fingerprints": ["D4:FC:00:46:2E:15:51:3A:1F:5E:7F:64:E0:44:AF:33:0A:FA:A8:78:DB:F8:6E:56:17:8E:5B:8C:13:61:C2:4F", "8D:FD:18:EB:B5:D8:84:81:84:E4:1D:85:59:E8:A5:19:9B:0C:9F:8D:CC:3F:D6:1B:33:F9:B9:B3:B7:4C:D0:07"]
       }
     }]
