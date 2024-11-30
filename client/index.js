@@ -64,8 +64,6 @@ function saveLocalStorage(items) {
     localStorage.setItem("items", JSON.stringify(items));
 }
 
-
-
 async function postRecord(item) {
     let newItem;
 
@@ -296,32 +294,10 @@ let records;
 let lists;
 let user;
 let repo;
-//let debugView;
 
-window.onload = async () => {
+window.onload = () => {
     document.getElementById('new-note').textContent = "";
     document.getElementById('footer').classList.remove('d-none');
-
-    window.visualViewport.onresize = () => {
-        document.body.style.height = `${window.visualViewport.height}px`;
-        document.body.style.bottom = 0;
-        //window.scrollTo({ top: 0 })
-    }
-
-    // const inputElements = document.querySelectorAll('input[type="text"], div[contenteditable="plaintext-only"]');
-    // for (const inputElement of inputElements) {
-    //     inputElement.addEventListener('focus', () => {
-    //         debugView.innerText = "Focused" + window.visualViewport.height;
-    //         // document.body.style.height = `calc(100dvh - env(keyboard-inset-height, 0px))`; // Adjust height
-    //         // document.body.style.height = `${window.visualViewport.height}px`;
-    //     });
-
-    //     inputElement.addEventListener('blur', () => {
-    //         // document.body.style.height = '100dvh'; // Reset height when the keyboard is closed
-    //         debugView.innerText = "Blur" + window.visualViewport.height
-    //     });
-    // }
-
 }
 
 window.onpageshow = async () => {
