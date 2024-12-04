@@ -283,7 +283,7 @@ function onSaveTasksToAccount() {
 }
 
 async function postLocalToApi() {
-    const tasks = getRecordsFromLocalStorage().map(item => ({ title: item.title }));
+    const tasks = getRecordsFromLocalStorage().map(item => ({ title: item.title, is_completed: item.is_completed }));
     console.log(tasks);
     for (const task of tasks) {
         taskFromLocal = await repo.save(task);
