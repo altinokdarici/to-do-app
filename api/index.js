@@ -35,6 +35,33 @@ app.use((req, res, next) => {
 });
 
 
+async function getAuth0AccessToken() {
+    const clientId = process.env.AUTH0_CLIENT_ID;
+    const clientSecret = process.env.AUTH0_CLIENT_SECRET;
+    const domain = process.env.AUTH0_DOMAIN;
+    const audience = `https://${domain}/api/v2/`;
+
+    const body = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+        audience: audience
+    });
+
+    try {
+        const response = await axios.post(`https://${domain}/oauth/token`, body.toString(), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+
+        return response.data.access_token;
+    } catch (error) {
+        console.error('Error fetching access token:', error);
+        throw new Error('Failed to fetch access token');
+    }
+}
+
 async function deleteAuth0User(userId, accessToken) {
     try {
         await fetch(`${process.env.AUTH_ISSUER_BASE_URL}/api/v2/users/${userId}`, {
