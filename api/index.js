@@ -34,6 +34,46 @@ app.use((req, res, next) => {
     })(req, res, next);
 });
 
+
+async function deleteAuth0User(userId, accessToken) {
+    try {
+        await fetch(`${process.env.AUTH_ISSUER_BASE_URL}/api/v2/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+    } catch (error) {
+        console.error('Error deleting Auth0 user:', error);
+        throw new Error('Failed to delete user from Auth0');
+    }
+}
+
+// DELETE: Remove a user from the system and Auth0
+app.delete('/api/user', requiresAuth(), async (req, res) => {
+    const userId = getUserId(req);
+    const accessToken = req.oidc.accessToken;
+    try {
+        // Delete user's todo items from your database
+        const result = await sql`
+            DELETE FROM "todo_items"
+            WHERE "user_id" = ${userId};
+        `;
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'No todo items found for the user' });
+        }
+
+        // Delete the user from Auth0
+        await deleteAuth0User(userId, accessToken);
+
+        res.status(200).json({ message: 'User and their data deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.get("/api/user", (req, res) => {
     if (!req.oidc?.user) {
         res.status(401).send({ error: 'User is not authenticated' });
